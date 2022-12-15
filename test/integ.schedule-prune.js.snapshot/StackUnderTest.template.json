@@ -1,0 +1,160 @@
+{
+ "Resources": {
+  "ScheduleRole756A1A25": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "scheduler.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   }
+  },
+  "ScheduleRoleDefaultPolicyE70FD4E8": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "TargetQueue08AD2B3C",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ScheduleRoleDefaultPolicyE70FD4E8",
+    "Roles": [
+     {
+      "Ref": "ScheduleRole756A1A25"
+     }
+    ]
+   }
+  },
+  "TargetQueue08AD2B3C": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete"
+  },
+  "RateBasedScheduleWithoutEndDate": {
+   "Type": "AWS::Scheduler::Schedule",
+   "Properties": {
+    "FlexibleTimeWindow": {
+     "Mode": "OFF"
+    },
+    "ScheduleExpression": "rate(1 day)",
+    "Target": {
+     "Arn": {
+      "Fn::GetAtt": [
+       "TargetQueue08AD2B3C",
+       "Arn"
+      ]
+     },
+     "Input": "{\"schedulerArn\":\"<aws.scheduler.schedule-arn>\"}",
+     "RoleArn": {
+      "Fn::GetAtt": [
+       "ScheduleRole756A1A25",
+       "Arn"
+      ]
+     }
+    }
+   }
+  },
+  "RateBasedScheduleWithFutureEndDate": {
+   "Type": "AWS::Scheduler::Schedule",
+   "Properties": {
+    "FlexibleTimeWindow": {
+     "Mode": "OFF"
+    },
+    "ScheduleExpression": "rate(1 day)",
+    "Target": {
+     "Arn": {
+      "Fn::GetAtt": [
+       "TargetQueue08AD2B3C",
+       "Arn"
+      ]
+     },
+     "Input": "{\"schedulerArn\":\"<aws.scheduler.schedule-arn>\"}",
+     "RoleArn": {
+      "Fn::GetAtt": [
+       "ScheduleRole756A1A25",
+       "Arn"
+      ]
+     }
+    },
+    "EndDate": "2023-01-04T16:08:30.248Z"
+   }
+  }
+ },
+ "Outputs": {
+  "ExportsOutputRefRateBasedScheduleWithoutEndDateF9A4D8F9": {
+   "Value": {
+    "Ref": "RateBasedScheduleWithoutEndDate"
+   },
+   "Export": {
+    "Name": "StackUnderTest:ExportsOutputRefRateBasedScheduleWithoutEndDateF9A4D8F9"
+   }
+  },
+  "ExportsOutputRefRateBasedScheduleWithFutureEndDate0CBB0FA7": {
+   "Value": {
+    "Ref": "RateBasedScheduleWithFutureEndDate"
+   },
+   "Export": {
+    "Name": "StackUnderTest:ExportsOutputRefRateBasedScheduleWithFutureEndDate0CBB0FA7"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

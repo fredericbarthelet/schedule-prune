@@ -6,15 +6,20 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest"
+    "test": "jest",
+    "integ": "integ-runner"
   },
   "devDependencies": {
+    "@aws-cdk/integ-runner": "^2.53.0",
+    "@aws-cdk/integ-tests-alpha": "^2.53.0-alpha.0",
+    "@aws-sdk/client-scheduler": "^3.223.0",
     "@types/babel__traverse": "7.18.2",
     "@types/jest": "^27.5.2",
-    "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
     "aws-cdk-lib": "2.53.0",
     "constructs": "^10.0.0",
+    "dayjs": "^1.11.6",
+    "esbuild": "^0.15.16",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.4",
     "typescript": "~3.9.7"
